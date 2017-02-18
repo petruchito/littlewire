@@ -161,6 +161,7 @@ static uint8_t adcSetting=0;
 static uint32_t temp;
 volatile uint8_t 	jobState=0;
 #define DATA_PIN 2
+#define DHT_DATA_PIN 0
 // ----------------------------------------------------------------------
 // ws2812 support
 #define ws2812_maxleds 64
@@ -1090,28 +1091,28 @@ uint8_t DHT_Read(unsigned char type) {
 
     uint16_t f;
 
-    pinMode(B,DATA_PIN,OUTPUT);
+    pinMode(B,DHT_DATA_PIN,OUTPUT);
 
     sendBuffer[0] = 0; sendBuffer[1] = 0; sendBuffer[2] = 0; sendBuffer[3] = 0; sendBuffer[4] = 0;
 
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-      digitalWrite(B,DATA_PIN, LOW);
+      digitalWrite(B,DHT_DATA_PIN, LOW);
       _delay_ms(18);
-      digitalWrite(B,DATA_PIN, HIGH);
+      digitalWrite(B,DHT_DATA_PIN, HIGH);
       _delay_us(40);
 
-      pinMode(B, DATA_PIN, INPUT);
-      internalPullup(B, DATA_PIN, DISABLE);
+      pinMode(B, DHT_DATA_PIN, INPUT);
+      internalPullup(B, DHT_DATA_PIN, DISABLE);
 
       timeout = DHT_TIMEOUT;
-      while(!digitalRead(B, DATA_PIN)) { // Wait for 1
+      while(!digitalRead(B, DHT_DATA_PIN)) { // Wait for 1
         if (timeout-- == 0) {
           return DHT_TIMEOUT_ERR;
         }
       }
 
       timeout = DHT_TIMEOUT;
-      while(digitalRead(B, DATA_PIN)) { // Wait for 0
+      while(digitalRead(B, DHT_DATA_PIN)) { // Wait for 0
           _delay_us(1);
         if (timeout-- == 0) {
           return DHT_TIMEOUT_ERR;
@@ -1121,7 +1122,7 @@ uint8_t DHT_Read(unsigned char type) {
 
       for (uint8_t i = 0; i < 40; i++) {
         timeout = DHT_TIMEOUT;
-        while(!digitalRead(B, DATA_PIN)) { // Wait for 1
+        while(!digitalRead(B, DHT_DATA_PIN)) { // Wait for 1
           if (timeout-- == 0) {
             return DHT_TIMEOUT_ERR;
           }
@@ -1129,7 +1130,7 @@ uint8_t DHT_Read(unsigned char type) {
 
         len = 0;
         timeout = DHT_TIMEOUT;
-        while(digitalRead(B, DATA_PIN)) { // Wait for 0
+        while(digitalRead(B, DHT_DATA_PIN)) { // Wait for 0
           _delay_us(DHT_DELAY);
           if (len++ == DHT_TIMEOUT) {
             return DHT_TIMEOUT_ERR;
